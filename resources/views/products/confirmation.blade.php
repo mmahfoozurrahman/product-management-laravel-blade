@@ -25,7 +25,7 @@
                         <dd class="col-sm-8">{{ $product->id }}</dd>
 
                         <dt class="col-sm-4">Category</dt>
-                        <dd class="col-sm-8">{{ $product->category?->name }}</dd>
+                        <dd class="col-sm-8">{{ $product->category_name }}</dd>
 
                         <dt class="col-sm-4">Product Name</dt>
                         <dd class="col-sm-8">{{ $product->name }}</dd>
@@ -36,6 +36,11 @@
                         <dt class="col-sm-4">Stock</dt>
                         <dd class="col-sm-8">{{ $product->stock }}</dd>
                     </dl>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <a href="{{ route('products.edit', $product->id) }}" class="btn btn-outline-primary">Edit Product</a>
+                        <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">Back to List</a>
+                    </div>
                 </div>
             </div>
         </div>

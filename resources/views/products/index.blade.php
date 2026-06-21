@@ -82,9 +82,21 @@
                                 <td class="text-end">${{ number_format((float) $product->price, 2) }}</td>
                                 <td class="text-end">{{ $product->stock }}</td>
                                 <td class="text-end">
-                                    <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-dark">
-                                        Details
-                                    </a>
+                                    <div class="d-inline-flex gap-2">
+                                        <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-dark">
+                                            Details
+                                        </a>
+                                        <a href="{{ route('products.edit', $product->id) }}" class="btn btn-sm btn-outline-primary">
+                                            Edit
+                                        </a>
+                                        <form action="{{ route('products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('Delete this product?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty

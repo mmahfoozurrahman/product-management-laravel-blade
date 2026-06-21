@@ -22,5 +22,8 @@ Route::prefix('products')->name('products.')->controller(ProductController::clas
     Route::get('/json', 'json')->name('json');
     Route::get('/redirect', 'redirectToIndex')->name('redirect');
     Route::get('/confirmation/{product}', 'confirmation')->whereNumber('product')->name('confirmation');
+    Route::get('/{product}/edit', 'edit')->whereNumber('product')->name('edit');
+    Route::match(['put', 'patch'], '/{product}', 'update')->whereNumber('product')->name('update');
+    Route::delete('/{product}', 'destroy')->whereNumber('product')->name('destroy');
     Route::get('/{product}', 'show')->whereNumber('product')->name('show');
 });

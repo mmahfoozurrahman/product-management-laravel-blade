@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -14,14 +13,11 @@ use Illuminate\View\View;
 class ProductController extends Controller
 {
     /**
-     * Display the product list.
+     * Build the base query for products with category names.
      */
-    public function index(Request $request): View
+    private function productQuery(): Builder
     {
-        $search = trim((string) $request->query('search', ''));
-        $sort = $request->query('sort', 'latest');
-
-        $productsQuery = DB::table('products')
+        return DB::table('products')
             ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
             ->select(
                 'products.id',
@@ -31,6 +27,17 @@ class ProductController extends Controller
                 'products.stock',
                 'categories.name as category_name'
             );
+    }
+
+    /**
+     * Display the product list.
+     */
+    public function index(Request $request): View
+    {
+        $search = trim((string) $request->query('search', ''));
+        $sort = $request->query('sort', 'latest');
+
+        $productsQuery = $this->productQuery();
 
         if ($search !== '') {
             $productsQuery->where('products.name', 'like', '%' . $search . '%');
@@ -52,9 +59,13 @@ class ProductController extends Controller
     /**
      * Display the given product.
      */
-    public function show(Product $product): View
+    public function show(int $product): View
     {
-        $product->load('category');
+        $product = $this->productQuery()
+            ->where('products.id', $product)
+            ->first();
+
+        abort_if($product === null, 404);
 
         return view('products.show', compact('product'));
     }
@@ -64,16 +75,7 @@ class ProductController extends Controller
      */
     public function json(): JsonResponse
     {
-        $products = DB::table('products')
-            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
-            ->select(
-                'products.id',
-                'products.category_id',
-                'products.name',
-                'products.price',
-                'products.stock',
-                'categories.name as category_name'
-            )
+        $products = $this->productQuery()
             ->orderByDesc('products.id')
             ->get();
 
@@ -103,15 +105,7 @@ class ProductController extends Controller
     {
         $categoryCount = DB::table('categories')->count();
         $productCount = DB::table('products')->count();
-        $latestProduct = DB::table('products')
-            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
-            ->select(
-                'products.id',
-                'products.name',
-                'products.price',
-                'products.stock',
-                'categories.name as category_name'
-            )
+        $latestProduct = $this->productQuery()
             ->orderByDesc('products.id')
             ->first();
 
@@ -123,7 +117,8 @@ class ProductController extends Controller
      */
     public function create(): View
     {
-        $categories = Category::query()
+        $categories = DB::table('categories')
+            ->select('id', 'name')
             ->orderBy('name')
             ->get();
 
@@ -142,29 +137,112 @@ class ProductController extends Controller
             'stock' => ['required', 'integer', 'min:0'],
         ]);
 
-        $product = Product::create($validated);
-        $product->load('category');
+        $category = DB::table('categories')
+            ->select('id', 'name')
+            ->where('id', $validated['category_id'])
+            ->first();
+
+        $productId = DB::table('products')->insertGetId([
+            'category_id' => $validated['category_id'],
+            'name' => $validated['name'],
+            'price' => $validated['price'],
+            'stock' => $validated['stock'],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $product = $this->productQuery()
+            ->where('products.id', $productId)
+            ->first();
 
         Log::info(
             'product id: ' . $product->id
-            . ', category: ' . $product->category->name
+            . ', category: ' . ($category->name ?? 'Unknown')
             . ', name: ' . $product->name
             . ', price: ' . $product->price
             . ', stock: ' . $product->stock
         );
 
         return redirect()
-            ->route('products.confirmation', $product)
+            ->route('products.confirmation', $product->id)
             ->with('status', 'Product created successfully.');
     }
 
     /**
      * Show the product confirmation page.
      */
-    public function confirmation(Product $product): View
+    public function confirmation(int $product): View
     {
-        $product->load('category');
+        $product = $this->productQuery()
+            ->where('products.id', $product)
+            ->first();
+
+        abort_if($product === null, 404);
 
         return view('products.confirmation', compact('product'));
+    }
+
+    /**
+     * Show the edit product form.
+     */
+    public function edit(int $product): View
+    {
+        $product = $this->productQuery()
+            ->where('products.id', $product)
+            ->first();
+
+        abort_if($product === null, 404);
+
+        $categories = DB::table('categories')
+            ->select('id', 'name')
+            ->orderBy('name')
+            ->get();
+
+        return view('products.edit', compact('product', 'categories'));
+    }
+
+    /**
+     * Update the given product.
+     */
+    public function update(Request $request, int $product): RedirectResponse
+    {
+        $validated = $request->validate([
+            'category_id' => ['required', 'integer', 'exists:categories,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'stock' => ['required', 'integer', 'min:0'],
+        ]);
+
+        abort_unless(DB::table('products')->where('id', $product)->exists(), 404);
+
+        DB::table('products')
+            ->where('id', $product)
+            ->update([
+                'category_id' => $validated['category_id'],
+                'name' => $validated['name'],
+                'price' => $validated['price'],
+                'stock' => $validated['stock'],
+                'updated_at' => now(),
+            ]);
+
+        return redirect()
+            ->route('products.show', $product)
+            ->with('status', 'Product updated successfully.');
+    }
+
+    /**
+     * Delete the given product.
+     */
+    public function destroy(int $product): RedirectResponse
+    {
+        $deleted = DB::table('products')
+            ->where('id', $product)
+            ->delete();
+
+        abort_if($deleted === 0, 404);
+
+        return redirect()
+            ->route('products.index')
+            ->with('status', 'Product deleted successfully.');
     }
 }
