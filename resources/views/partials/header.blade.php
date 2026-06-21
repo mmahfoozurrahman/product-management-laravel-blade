@@ -4,7 +4,7 @@
             <div>
                 <p class="text-uppercase text-muted small mb-1">{{ config('app.name') }}</p>
                 <h1 class="h3 page-title mb-0">@yield('page_title', 'Dashboard')</h1>
-                <p class="text-muted mb-0">@yield('page_subtitle', 'Reusable Blade layout scaffold')</p>
+                <p class="text-muted mb-0">@yield('page_subtitle', 'Reusable Blade layout for the product management workspace')</p>
             </div>
 
             <div class="d-flex align-items-center gap-2">

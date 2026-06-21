@@ -2,7 +2,7 @@
 
 @section('title', 'Product Module Summary')
 @section('page_title', 'Product Module Summary')
-@section('page_subtitle', 'A small bridge page that will help when we add create and redirect flows later.')
+@section('page_subtitle', 'A compact overview of the product management module.')
 
 @section('content')
     <div class="row g-4">

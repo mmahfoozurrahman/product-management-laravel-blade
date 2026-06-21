@@ -10,15 +10,15 @@
     </a>
 
     <nav class="nav flex-column gap-1">
-        <a href="{{ url('/') }}" class="nav-link active">
+        <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard*') ? 'active' : '' }}">
             <i class="bi bi-speedometer2 me-2"></i>
             Dashboard
         </a>
-        <a href="{{ route('products.index') }}" class="nav-link">
+        <a href="{{ route('products.index') }}" class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">
             <i class="bi bi-box-seam me-2"></i>
             Products List
         </a>
-        <a href="{{ route('categories.create') }}" class="nav-link">
+        <a href="{{ route('categories.create') }}" class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
             <i class="bi bi-diagram-3 me-2"></i>
             Create Category
         </a>

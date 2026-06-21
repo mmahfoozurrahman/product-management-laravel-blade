@@ -4,7 +4,7 @@
             &copy; {{ now()->year }} {{ config('app.name') }}. Built with Laravel Blade.
         </small>
         <small class="text-muted">
-            Step 4 layout scaffold
+            Product management workspace
         </small>
     </div>
 </footer>

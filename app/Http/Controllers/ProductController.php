@@ -97,9 +97,6 @@ class ProductController extends Controller
 
     /**
      * Sample summary data for the module home page.
-     *
-     * This stays lightweight now and can be expanded in Step 5 when form
-     * handling and product creation are added.
      */
     public function summary(): View
     {

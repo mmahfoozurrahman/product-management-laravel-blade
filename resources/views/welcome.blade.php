@@ -2,7 +2,7 @@
 
 @section('title', 'Dashboard')
 @section('page_title', 'Product Management Dashboard')
-@section('page_subtitle', 'A clean Blade layout scaffold for the upcoming product management modules.')
+@section('page_subtitle', 'A clean Blade layout for the product management workspace.')
 
 @section('content')
     @php
@@ -10,7 +10,7 @@
             [
                 'label' => 'Total Categories',
                 'value' => 0,
-                'note' => 'Ready for Step 7 statistics.',
+                'note' => 'Ready for dashboard statistics.',
                 'icon' => 'bi bi-diagram-3',
                 'accent' => 'primary',
             ],
