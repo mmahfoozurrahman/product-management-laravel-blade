@@ -18,6 +18,7 @@
                 <small class="text-muted">Ready for Eloquent data and later CRUD work.</small>
             </div>
             <div class="d-flex gap-2">
+                <a href="{{ route('products.create') }}" class="btn btn-primary btn-sm">Add Product</a>
                 <a href="{{ route('products.summary') }}" class="btn btn-outline-secondary btn-sm">Module Summary</a>
                 <a href="{{ route('products.json') }}" class="btn btn-outline-primary btn-sm">JSON Response</a>
             </div>

@@ -14,9 +14,9 @@
             <i class="bi bi-speedometer2 me-2"></i>
             Dashboard
         </a>
-        <a href="#" class="nav-link">
+        <a href="{{ route('products.index') }}" class="nav-link">
             <i class="bi bi-box-seam me-2"></i>
-            Products
+            Products List
         </a>
         <a href="#" class="nav-link">
             <i class="bi bi-diagram-3 me-2"></i>

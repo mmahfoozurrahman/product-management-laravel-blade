@@ -6,6 +6,8 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class ProductController extends Controller
@@ -70,5 +72,55 @@ class ProductController extends Controller
         $latestProduct = Product::with('category')->latest()->first();
 
         return view('products.summary', compact('categoryCount', 'productCount', 'latestProduct'));
+    }
+
+    /**
+     * Show the create product form.
+     */
+    public function create(): View
+    {
+        $categories = Category::query()
+            ->orderBy('name')
+            ->get();
+
+        return view('products.create', compact('categories'));
+    }
+
+    /**
+     * Store a newly created product.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'category_id' => ['required', 'integer', 'exists:categories,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'stock' => ['required', 'integer', 'min:0'],
+        ]);
+
+        $product = Product::create($validated);
+        $product->load('category');
+
+        Log::info(
+            'product id: ' . $product->id
+            . ', category: ' . $product->category->name
+            . ', name: ' . $product->name
+            . ', price: ' . $product->price
+            . ', stock: ' . $product->stock
+        );
+
+        return redirect()
+            ->route('products.confirmation', $product)
+            ->with('status', 'Product created successfully.');
+    }
+
+    /**
+     * Show the product confirmation page.
+     */
+    public function confirmation(Product $product): View
+    {
+        $product->load('category');
+
+        return view('products.confirmation', compact('product'));
     }
 }
