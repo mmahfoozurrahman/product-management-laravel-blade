@@ -24,6 +24,10 @@ A Laravel-based product management app with category and product workflows, an a
   - Master layout with header, navbar, and footer partials.
   - Reusable form partials and clean admin-style pages.
 
+## Video Demo
+
+[Watch the YouTube demo](https://www.youtube.com/watch?v=xLid4bX_72s)
+
 ## Screenshot
 
 ![Dashboard](public/images/dashboard.png)
