@@ -13,6 +13,15 @@
                 </div>
 
                 <div class="card-body">
+                    @if ($categories->isEmpty())
+                        <div class="alert alert-warning border-0 shadow-sm">
+                            No categories exist yet. Please create a category first so this product can be assigned properly.
+                            <div class="mt-2">
+                                <a href="{{ route('categories.create') }}" class="btn btn-sm btn-warning">Create Category</a>
+                            </div>
+                        </div>
+                    @endif
+
                     <form action="{{ route('products.store') }}" method="POST" novalidate>
                         @csrf
 
@@ -22,6 +31,7 @@
                                 name="category_id"
                                 id="category_id"
                                 class="form-select @error('category_id') is-invalid @enderror"
+                                @disabled($categories->isEmpty())
                             >
                                 <option value="">Select category</option>
                                 @foreach ($categories as $category)
@@ -85,7 +95,7 @@
 
                         <div class="d-flex justify-content-between align-items-center mt-4">
                             <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">Back</a>
-                            <button type="submit" class="btn btn-primary">Save Product</button>
+                            <button type="submit" class="btn btn-primary" @disabled($categories->isEmpty())>Save Product</button>
                         </div>
                     </form>
                 </div>

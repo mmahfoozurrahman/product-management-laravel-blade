@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
@@ -15,13 +16,37 @@ class ProductController extends Controller
     /**
      * Display the product list.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $products = Product::with('category')
-            ->latest()
-            ->get();
+        $search = trim((string) $request->query('search', ''));
+        $sort = $request->query('sort', 'latest');
 
-        return view('products.index', compact('products'));
+        $productsQuery = DB::table('products')
+            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->select(
+                'products.id',
+                'products.category_id',
+                'products.name',
+                'products.price',
+                'products.stock',
+                'categories.name as category_name'
+            );
+
+        if ($search !== '') {
+            $productsQuery->where('products.name', 'like', '%' . $search . '%');
+        }
+
+        match ($sort) {
+            'price_asc' => $productsQuery->orderBy('products.price', 'asc'),
+            'price_desc' => $productsQuery->orderBy('products.price', 'desc'),
+            default => $productsQuery->orderByDesc('products.id'),
+        };
+
+        $products = $productsQuery->get();
+
+        $productCount = DB::table('products')->count();
+
+        return view('products.index', compact('products', 'productCount', 'search', 'sort'));
     }
 
     /**
@@ -39,8 +64,17 @@ class ProductController extends Controller
      */
     public function json(): JsonResponse
     {
-        $products = Product::with('category')
-            ->latest()
+        $products = DB::table('products')
+            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->select(
+                'products.id',
+                'products.category_id',
+                'products.name',
+                'products.price',
+                'products.stock',
+                'categories.name as category_name'
+            )
+            ->orderByDesc('products.id')
             ->get();
 
         return response()->json([
@@ -67,9 +101,19 @@ class ProductController extends Controller
      */
     public function summary(): View
     {
-        $categoryCount = Category::count();
-        $productCount = Product::count();
-        $latestProduct = Product::with('category')->latest()->first();
+        $categoryCount = DB::table('categories')->count();
+        $productCount = DB::table('products')->count();
+        $latestProduct = DB::table('products')
+            ->leftJoin('categories', 'products.category_id', '=', 'categories.id')
+            ->select(
+                'products.id',
+                'products.name',
+                'products.price',
+                'products.stock',
+                'categories.name as category_name'
+            )
+            ->orderByDesc('products.id')
+            ->first();
 
         return view('products.summary', compact('categoryCount', 'productCount', 'latestProduct'));
     }

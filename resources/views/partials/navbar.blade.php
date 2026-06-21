@@ -18,9 +18,9 @@
             <i class="bi bi-box-seam me-2"></i>
             Products List
         </a>
-        <a href="#" class="nav-link">
+        <a href="{{ route('categories.create') }}" class="nav-link">
             <i class="bi bi-diagram-3 me-2"></i>
-            Categories
+            Create Category
         </a>
     </nav>
 

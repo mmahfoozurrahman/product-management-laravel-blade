@@ -30,7 +30,7 @@
                     <p class="text-muted text-uppercase small mb-2">Latest Product</p>
                     <h5 class="mb-1">{{ $latestProduct?->name ?? 'No product yet' }}</h5>
                     <p class="text-muted mb-0">
-                        {{ $latestProduct?->category?->name ?? 'Waiting for data' }}
+                        {{ $latestProduct?->category_name ?? 'Waiting for data' }}
                     </p>
                 </div>
             </div>
