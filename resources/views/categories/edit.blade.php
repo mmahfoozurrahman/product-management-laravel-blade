@@ -1,20 +1,21 @@
 @extends('layouts.master')
 
-@section('title', 'Create Category')
-@section('page_title', 'Create Category')
-@section('page_subtitle', 'Create a category first so products can be assigned to it.')
+@section('title', 'Edit Category')
+@section('page_title', 'Edit Category')
+@section('page_subtitle', 'Update the category name while keeping the product assignments intact.')
 
 @section('content')
     <div class="row justify-content-center">
         <div class="col-12 col-lg-7">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white border-0">
-                    <h5 class="mb-0">Category Form</h5>
+                    <h5 class="mb-0">Edit Category</h5>
                 </div>
 
                 <div class="card-body">
-                    <form action="{{ route('categories.store') }}" method="POST" novalidate>
+                    <form action="{{ route('categories.update', $category->id) }}" method="POST" novalidate>
                         @csrf
+                        @method('PUT')
 
                         <div class="mb-3">
                             <label for="name" class="form-label">Category Name</label>
@@ -23,7 +24,7 @@
                                 name="name"
                                 id="name"
                                 class="form-control @error('name') is-invalid @enderror"
-                                value="{{ old('name') }}"
+                                value="{{ old('name', $category->name) }}"
                             >
                             @error('name')
                                 <div class="text-danger small mt-1">{{ $message }}</div>
@@ -31,8 +32,8 @@
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center">
-                            <a href="{{ route('categories.index') }}" class="btn btn-outline-secondary">Back to Categories</a>
-                            <button type="submit" class="btn btn-primary">Save Category</button>
+                            <a href="{{ route('categories.show', $category->id) }}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Category</button>
                         </div>
                     </form>
                 </div>
