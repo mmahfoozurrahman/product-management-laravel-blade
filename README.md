@@ -26,7 +26,7 @@ A Laravel-based product management app with category and product workflows, an a
 
 ## Video Demo
 
-[Watch the YouTube demo](https://www.youtube.com/watch?v=xLid4bX_72s)
+[Watch the YouTube demo](https://www.youtube.com/watch?v=IpLoDv09Vlg)
 
 ## Screenshot
 
